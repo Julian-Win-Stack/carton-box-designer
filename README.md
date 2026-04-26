@@ -3,7 +3,7 @@
 Internal tool replacing 1.5 full-time designers at my family's carton box manufacturing factory in Myanmar. This tool replaces a workflow I watched my family's design team do thousands of times growing up.
 
 
-Designers receive sample boxes from customers and recreate them as print-ready files in Adobe Illustrator. The manual process takes ~20 minutes per box and consumes 1.5 designers' full work week. This app cuts that to ~2 minutes.
+Designers receive sample boxes from customers and recreate them as print-ready files in Adobe Illustrator. The manual process takes ~60 minutes per box and consumes 2 designers' full work week. This app cuts that to ~5 minutes.
 
 ## The problem
 

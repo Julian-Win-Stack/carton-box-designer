@@ -15,7 +15,18 @@ const g = globalThis as unknown as { __db?: Database.Database };
 function open(): Database.Database {
   const db = new Database(DB_PATH);
   db.pragma('journal_mode = WAL');
+  db.pragma('foreign_keys = ON');
   db.exec(fs.readFileSync(SCHEMA_PATH, 'utf8'));
+  try {
+    db.exec('ALTER TABLE designs ADD COLUMN palette_confirmed_at TEXT');
+  } catch {
+    // column already exists — safe to ignore
+  }
+  try {
+    db.exec('ALTER TABLE designs ADD COLUMN color_count INTEGER');
+  } catch {
+    // column already exists — safe to ignore
+  }
   return db;
 }
 

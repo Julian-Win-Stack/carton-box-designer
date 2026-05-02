@@ -60,7 +60,7 @@ Photo upload → Crop region → Preprocess (sharp) → Vectorize (vtracer)
 
 - [x] Project bootstrapped
 - [x] Photo upload + storage
-- [ ] Color palette detection (Gemini + sharp masks)
+- [x] Color palette detection (Gemini + sharp masks)
 - [ ] Per-color vectorization (monochrome vtracer per mask)
 - [ ] Canvas + drag-and-drop
 - [ ] Color editing (per-group fill swap)
@@ -74,8 +74,13 @@ Photo upload → Crop region → Preprocess (sharp) → Vectorize (vtracer)
 git clone <repo-url>
 cd carton-box-design
 npm install
+cp .env.example .env   # or create .env manually
 npm run dev
 ```
+
+Required `.env` variables:
+- `DATA_DIR` — path to the runtime data directory (default: `./data`)
+- `GEMINI_API_KEY` — Google Gemini API key (get one at https://aistudio.google.com)
 
 Open `http://localhost:3000`.
 

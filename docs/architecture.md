@@ -7,12 +7,14 @@ internal refactors.
 
 ## v1 data flow
 
-Step 1 (photo upload) is complete. Step 2 (color palette detection) and
+Input is a scan from a flatbed scanner (cardboard laid flat). Not a phone photo.
+
+Step 1 (scan upload) is complete. Step 2 (color palette detection) and
 Step 3 (per-color vectorization) are next; see `docs/build-plan.md`.
 
 ```
-photo → LLM (palette) → sharp (masks) → vtracer per layer
-      → combined layered SVG → canvas → export
+scan → LLM (palette) → sharp (masks) → vtracer per layer
+     → combined layered SVG → canvas → export
 ```
 
 ## Folder structure

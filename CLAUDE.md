@@ -1,14 +1,19 @@
 # Carton Box Design
 
 Internal web app for a family carton-box manufacturing business in Myanmar.
-Designers upload photos of customer sample boxes; the app vectorizes text/logos,
-drops them onto a die-cut canvas where shapes can be recolored, then exports
-print-ready SVG/PDF artwork. Internal tool, ~1–2 designers. Not public.
+Designers scan customer sample boxes (cardboard laid flat on a flatbed scanner)
+and upload the scan; the app vectorizes text/logos, drops them onto a die-cut
+canvas where shapes can be recolored, then exports print-ready SVG/PDF artwork.
+Internal tool, ~1–2 designers. Not public.
+
+**Input is always a scan, not a phone photo.** Assume clean, calibrated,
+shadow-free input on a uniform scanner-bed background. Do not engineer for
+camera artifacts (lens blur, perspective distortion, lighting variation).
 
 ## v1 scope
-One designer can: upload a photo → crop one region → vectorize to SVG → drop on
-a die-cut canvas → recolor a shape → export SVG/PDF. Anything beyond that is
-v2+.
+One designer can: upload a scan → crop to the box region → vectorize to SVG →
+drop on a die-cut canvas → recolor a shape → export SVG/PDF. Anything beyond
+that is v2+.
 
 ## Engineering principles
 - Ship the smallest working version first.

@@ -6,7 +6,8 @@
       "Bash(npm install *)",
       "Bash(npm run *)",
       "Bash(git init *)",
-      "Bash(git *)"
+      "Bash(git *)",
+      "WebSearch"
     ]
   }
 }

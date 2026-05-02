@@ -8,9 +8,9 @@ section.
 ## Routes
 
 ### `POST /api/uploads`
-Upload a photo. Saves to `${UPLOADS_DIR}/<uuid>.<ext>`, inserts a `designs` row, and redirects `303` to `/designs/<id>`.
+Upload a scan (cardboard laid flat on a flatbed scanner). Saves to `${UPLOADS_DIR}/<uuid>.<ext>`, inserts a `designs` row, and redirects `303` to `/designs/<id>`.
 
-**Request:** `multipart/form-data` with field `photo` (PNG, JPEG, or WebP; max 20 MB).
+**Request:** `multipart/form-data` with field `photo` (PNG, JPEG, or WebP; max 20 MB). The field is named `photo` for legacy reasons — the project pivoted to scanner input after this endpoint shipped. Rename to `scan` when convenient (requires updating the route handler and upload form).
 
 **Responses:**
 - `303` + `Location: /designs/<id>` — success
@@ -18,11 +18,53 @@ Upload a photo. Saves to `${UPLOADS_DIR}/<uuid>.<ext>`, inserts a `designs` row,
 - `413 { error }` — file exceeds 20 MB
 
 ### `GET /api/designs/[id]/image`
-Serve the raw photo bytes for a design by id. Used by `<img>` tags on `/designs/[id]`.
+Serve the raw scan bytes for a design by id. Used by `<img>` tags on `/designs/[id]`.
 
 **Responses:**
 - `200` with `content-type` matching the uploaded format — success
 - `404` — design id not found, or file missing on disk
+
+### `POST /api/designs/[id]/detect-colors`
+Run Gemini palette extraction + sharp mask generation for a design. Stores `count` on the design row and replaces any existing regions.
+
+**Request:** JSON body `{ count: number, hint?: string }`. `count` is required (1–4). `hint` is optional extra context forwarded to Gemini (e.g. `"ignore the QR code area"`).
+
+**Responses:**
+- `204` — success; caller should re-fetch regions
+- `400 { error }` — invalid id
+- `404 { error }` — design not found
+- `422 { error }` — Gemini returned no usable colors
+
+### `POST /api/designs/[id]/confirm`
+Lock the palette for a design, enabling Step 3 (vectorization). Idempotent.
+
+**Responses:**
+- `204` — confirmed (or already confirmed)
+- `422 { error }` — no regions to confirm
+
+### `GET /api/regions/[id]/mask`
+Serve the binary mask PNG for a region. Used by `<img>` tags in the palette editor. Append `?v=<n>` as a cache-buster after threshold changes.
+
+**Responses:**
+- `200` with `content-type: image/png` — success
+- `404` — region not found or mask file missing
+
+### `PATCH /api/regions/[id]`
+Update a region's threshold (regenerates mask) and/or color name.
+
+**Request:** JSON body `{ threshold?: number, colorName?: string }`. At least one field required.
+
+**Responses:**
+- `204` — updated
+- `400 { error }` — invalid id or nothing to update
+- `404 { error }` — region not found
+
+### `DELETE /api/regions/[id]`
+Delete a region and its mask file from disk.
+
+**Responses:**
+- `204` — deleted
+- `404 { error }` — region not found
 
 ## Conventions
 - App Router route handlers in `src/app/api/<name>/route.ts`

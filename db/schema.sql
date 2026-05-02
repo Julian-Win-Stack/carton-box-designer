@@ -9,3 +9,17 @@ CREATE TABLE IF NOT EXISTS designs (
   storage_path TEXT NOT NULL,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+CREATE TABLE IF NOT EXISTS regions (
+  id INTEGER PRIMARY KEY,
+  design_id INTEGER NOT NULL REFERENCES designs(id) ON DELETE CASCADE,
+  source_path TEXT NOT NULL,
+  color_hex TEXT NOT NULL,
+  color_name TEXT NOT NULL,
+  mask_path TEXT NOT NULL,
+  threshold INTEGER NOT NULL DEFAULT 100,
+  vectorized_svg_path TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_regions_design_id ON regions(design_id);

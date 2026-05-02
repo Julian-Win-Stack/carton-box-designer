@@ -25,22 +25,24 @@ fine until it isn't.
 - `snake_case` table and column names
 - `INTEGER PRIMARY KEY` for ids (SQLite alias for ROWID, fastest lookup)
 - `created_at TEXT DEFAULT (datetime('now'))` for timestamps
-- Foreign keys ON: enable `PRAGMA foreign_keys = ON` per connection if/when we add FKs
+- Foreign keys: `PRAGMA foreign_keys = ON` is now enabled in `src/lib/db.ts` (added when `regions` introduced the first FK)
 
 ## Tables
 
 ### `designs`
-Tracks each uploaded design photo.
+Tracks each uploaded design scan.
 
 | Column | Type | Notes |
 | --- | --- | --- |
 | `id` | `INTEGER PRIMARY KEY` | auto ROWID |
 | `original_filename` | `TEXT NOT NULL` | name provided by the browser on upload |
 | `storage_path` | `TEXT NOT NULL` | filename only (e.g. `<uuid>.png`); full path = `${UPLOADS_DIR}/<storage_path>` |
+| `color_count` | `INTEGER` | number of ink colors the designer specified (1–4); `NULL` until the user picks on first visit |
+| `palette_confirmed_at` | `TEXT` | set when designer confirms palette in Step 2; `NULL` until confirmed |
 | `created_at` | `TEXT NOT NULL DEFAULT (datetime('now'))` | |
 
 ### `regions`
-One row per ink-color layer detected from a design photo. Created in Step 2
+One row per ink-color layer detected from a design scan. Created in Step 2
 (color detection); `vectorized_svg_path` populated in Step 3. No `crop_x/y/w/h`
 or `type` columns — those are not part of the color-based approach.
 
@@ -48,9 +50,10 @@ or `type` columns — those are not part of the color-based approach.
 | --- | --- | --- |
 | `id` | `INTEGER PRIMARY KEY` | auto ROWID |
 | `design_id` | `INTEGER NOT NULL` | FK → `designs.id` |
-| `source_path` | `TEXT NOT NULL` | filename of the source photo (mirrors `designs.storage_path`) |
+| `source_path` | `TEXT NOT NULL` | filename of the source scan (mirrors `designs.storage_path`) |
 | `color_hex` | `TEXT NOT NULL` | e.g. `#1a3a8f` |
 | `color_name` | `TEXT NOT NULL` | descriptive name from Gemini, e.g. `navy blue` |
 | `mask_path` | `TEXT NOT NULL` | filename of the binary mask PNG in `${UPLOADS_DIR}` |
+| `threshold` | `INTEGER NOT NULL DEFAULT 100` | RGB-Euclidean distance threshold (1–441) for mask generation; tunable per color |
 | `vectorized_svg_path` | `TEXT` | filename of the per-layer SVG; `NULL` until Step 3 runs |
 | `created_at` | `TEXT NOT NULL DEFAULT (datetime('now'))` | |

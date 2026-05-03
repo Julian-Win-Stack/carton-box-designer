@@ -14,7 +14,6 @@ interface Region {
 interface Design {
   id: number;
   original_filename: string;
-  palette_confirmed_at: string | null;
   color_count: number;
 }
 
@@ -37,7 +36,6 @@ export default function PaletteEditor({ design, regions: initialRegions }: Props
   const [hint, setHint] = useState('');
   const [redetectCount, setRedetectCount] = useState(design.color_count);
   const [showRedetect, setShowRedetect] = useState(false);
-  const confirmed = !!design.palette_confirmed_at;
   const thresholdTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
 
   useEffect(() => {
@@ -145,17 +143,14 @@ export default function PaletteEditor({ design, regions: initialRegions }: Props
                         handleNameChange(r.id, e.target.value.trim());
                       }
                     }}
-                    disabled={confirmed}
                   />
                   <span className="font-mono text-xs text-gray-400">{r.color_hex}</span>
-                  {!confirmed && (
-                    <button
-                      onClick={() => handleDelete(r.id)}
-                      className="text-xs text-red-400 hover:text-red-600"
-                    >
-                      Remove
-                    </button>
-                  )}
+                  <button
+                    onClick={() => handleDelete(r.id)}
+                    className="text-xs text-red-400 hover:text-red-600"
+                  >
+                    Remove
+                  </button>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -167,7 +162,6 @@ export default function PaletteEditor({ design, regions: initialRegions }: Props
                     value={r.threshold}
                     onChange={(e) => handleThresholdChange(r.id, Number(e.target.value))}
                     className="flex-1"
-                    disabled={confirmed}
                   />
                   <span className="w-6 text-right text-xs text-gray-400">{r.threshold}</span>
                 </div>
@@ -184,10 +178,9 @@ export default function PaletteEditor({ design, regions: initialRegions }: Props
           ))}
 
           {/* Actions */}
-          {!confirmed && (
-            <div className="flex flex-col gap-3 border-t border-gray-100 pt-3">
-              {/* Re-detect */}
-              {showRedetect ? (
+          <div className="flex flex-col gap-3 border-t border-gray-100 pt-3">
+            {/* Re-detect */}
+            {showRedetect ? (
                 <div className="flex flex-col gap-3 rounded border border-gray-200 p-3">
                   <div>
                     <p className="mb-2 text-xs font-medium text-gray-500">Number of colors</p>
@@ -247,13 +240,6 @@ export default function PaletteEditor({ design, regions: initialRegions }: Props
                 Confirm palette
               </button>
             </div>
-          )}
-
-          {confirmed && (
-            <p className="text-sm text-green-600">
-              Palette confirmed — ready for vectorization.
-            </p>
-          )}
         </div>
       </div>
     </main>

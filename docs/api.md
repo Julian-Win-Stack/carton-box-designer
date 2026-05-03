@@ -66,6 +66,35 @@ Delete a region and its mask file from disk.
 - `204` — deleted
 - `404 { error }` — region not found
 
+### `POST /api/designs/[id]/vectorize`
+Vectorize all confirmed color regions for a design. Runs `@neplex/vectorizer` in binary mode on each region's mask, writes per-region SVG files to disk, and updates `regions.vectorized_svg_path`.
+
+**Responses:**
+- `200 { regions: [{ id, vectorized_svg_path }] }` — success
+- `404 { error }` — design not found
+- `422 { error }` — palette not confirmed
+
+### `GET /api/designs/[id]/combined-svg`
+Assemble and return a single layered SVG from all vectorized region layers, in region id order. Each color is a `<g id="<slug>">` group. Regenerated on every request (no cache).
+
+**Responses:**
+- `200` with `content-type: image/svg+xml` — success
+- `404` — design not found, or no vectorized regions yet
+
+### `POST /api/regions/[id]/vectorize`
+Re-vectorize a single region (manual retry). Replaces the existing `vectorized_svg_path` file.
+
+**Responses:**
+- `200 { id, vectorized_svg_path }` — success
+- `404 { error }` — region not found
+
+### `GET /api/regions/[id]/svg`
+Serve the per-region SVG file. Used by `<img>` tags in the vectorization view.
+
+**Responses:**
+- `200` with `content-type: image/svg+xml` — success
+- `404` — region not found, or SVG not yet generated
+
 ## Conventions
 - App Router route handlers in `src/app/api/<name>/route.ts`
 - Request/response bodies are JSON unless explicitly noted (uploads are

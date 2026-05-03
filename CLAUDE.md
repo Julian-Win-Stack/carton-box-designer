@@ -15,6 +15,10 @@ One designer can: upload a scan → crop to the box region → vectorize to SVG 
 drop on a die-cut canvas → recolor a shape → export SVG/PDF. Anything beyond
 that is v2+.
 
+## Stack highlights
+- `@neplex/vectorizer` — NAPI-RS native binding; call as `vectorize(buffer, config)` returning `Promise<string>` (SVG). Use numeric literals for enum fields (`colorMode: 1` = Binary) — `const enum` + `isolatedModules` are incompatible.
+- `svgo` v4 — ESM package; `optimize(svgStr, { plugins: [...] })` returns `{ data: string }`. Use `preset-default` with `overrides` to disable individual plugins.
+
 ## Engineering principles
 - Ship the smallest working version first.
 - Raw SQL, not ORMs — until we hit real pain.

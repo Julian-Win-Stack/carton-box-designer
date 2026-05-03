@@ -131,11 +131,3 @@ Export the final canvas as a print-ready SVG and PDF.
 *Placeholder — full design session pending.*
 
 Support multiple box panels in a single die-cut canvas layout.
-
----
-
-## Step 8 — Customer brand color palettes
-
-*Placeholder — full design session pending.*
-
-Store and reuse a customer's known brand colors across multiple designs.

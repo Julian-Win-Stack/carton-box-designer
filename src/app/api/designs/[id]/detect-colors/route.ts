@@ -67,21 +67,30 @@ export async function POST(
     return NextResponse.json({ error: 'Image file not found' }, { status: 404 });
   }
 
+  // TEMP: latency instrumentation. Remove once detect-colors is comfortably
+  // under ~10s end-to-end.
+  const tGemini = Date.now();
   let palette;
   try {
     palette = await detectPalette(imageBuffer, mimeType, count, hint);
-  } catch {
+  } catch (err) {
+    // detectPalette already logs error details via console.error. Log here too
+    // with route context so failure rows are easy to find in the dev terminal.
+    console.error(`[detect-colors] detectPalette threw after ${Date.now() - tGemini}ms (designId=${id})`, err);
     return NextResponse.json({ error: 'Color detection failed' }, { status: 502 });
   }
+  console.log(`[detect-colors] gemini ms: ${Date.now() - tGemini}`);
 
   if (palette.length === 0) {
     return NextResponse.json({ error: 'No colors detected' }, { status: 422 });
   }
 
   // Generate all mask buffers before touching the DB
+  const tMasks = Date.now();
   const masks = await Promise.all(
-    palette.map((c) => generateMask(imagePath, c.hex, 100))
+    palette.map((c) => generateMask(imagePath, c.hex, 50))
   );
+  console.log(`[detect-colors] masks ms: ${Date.now() - tMasks} (n=${palette.length})`);
 
   // Fetch old region mask paths before deleting
   const oldRegions = db
@@ -89,6 +98,7 @@ export async function POST(
     .all(id) as RegionRow[];
 
   // Write new mask files to disk
+  const tWrite = Date.now();
   const maskFilenames = await Promise.all(
     masks.map(async (buf) => {
       const filename = `${randomUUID()}.png`;
@@ -96,16 +106,17 @@ export async function POST(
       return filename;
     })
   );
+  console.log(`[detect-colors] write ms: ${Date.now() - tWrite}`);
 
   // Atomic DB swap — update color_count, delete old regions, insert new ones
   db.transaction(() => {
     db.prepare('UPDATE designs SET color_count = ? WHERE id = ?').run(count, id);
     db.prepare('DELETE FROM regions WHERE design_id = ?').run(id);
     const insert = db.prepare(
-      'INSERT INTO regions (design_id, source_path, color_hex, color_name, mask_path) VALUES (?, ?, ?, ?, ?)'
+      'INSERT INTO regions (design_id, source_path, color_hex, color_name, mask_path, threshold) VALUES (?, ?, ?, ?, ?, ?)'
     );
     for (let i = 0; i < palette.length; i++) {
-      insert.run(id, design.storage_path, palette[i].hex, palette[i].name, maskFilenames[i]);
+      insert.run(id, design.storage_path, palette[i].hex, palette[i].name, maskFilenames[i], 50);
     }
   })();
 

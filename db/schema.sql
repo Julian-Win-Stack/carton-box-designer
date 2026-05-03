@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS regions (
   color_hex TEXT NOT NULL,
   color_name TEXT NOT NULL,
   mask_path TEXT NOT NULL,
-  threshold INTEGER NOT NULL DEFAULT 100,
+  threshold INTEGER NOT NULL DEFAULT 50,
   vectorized_svg_path TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );

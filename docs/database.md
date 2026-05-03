@@ -55,5 +55,5 @@ or `type` columns — those are not part of the color-based approach.
 | `color_name` | `TEXT NOT NULL` | descriptive name from Gemini, e.g. `navy blue` |
 | `mask_path` | `TEXT NOT NULL` | filename of the binary mask PNG in `${UPLOADS_DIR}` |
 | `threshold` | `INTEGER NOT NULL DEFAULT 100` | RGB-Euclidean distance threshold (1–441) for mask generation; tunable per color |
-| `vectorized_svg_path` | `TEXT` | filename of the per-layer SVG; `NULL` until Step 3 runs |
+| `vectorized_svg_path` | `TEXT` | filename of the per-layer SVG in `${UPLOADS_DIR}`; `NULL` until Step 3 runs; written by `POST /api/designs/[id]/vectorize` and `POST /api/regions/[id]/vectorize` |
 | `created_at` | `TEXT NOT NULL DEFAULT (datetime('now'))` | |

@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import db from '@/lib/db';
 import PaletteEditor from '@/components/PaletteEditor';
 import ColorCountPicker from '@/components/ColorCountPicker';
+import VectorizationView from '@/components/VectorizationView';
 
 interface Props {
   params: { id: string };
@@ -21,6 +22,7 @@ interface Region {
   color_name: string;
   threshold: number;
   mask_path: string;
+  vectorized_svg_path: string | null;
 }
 
 export default function DesignPage({ params }: Props) {
@@ -42,15 +44,28 @@ export default function DesignPage({ params }: Props) {
   }
 
   const regions = db
-    .prepare('SELECT id, color_hex, color_name, threshold, mask_path FROM regions WHERE design_id = ? ORDER BY id')
+    .prepare('SELECT id, color_hex, color_name, threshold, mask_path, vectorized_svg_path FROM regions WHERE design_id = ? ORDER BY id')
     .all(id) as Region[];
+
+  if (design.palette_confirmed_at) {
+    return (
+      <VectorizationView
+        design={{ id: design.id, original_filename: design.original_filename }}
+        regions={regions.map((r) => ({
+          id: r.id,
+          color_hex: r.color_hex,
+          color_name: r.color_name,
+          vectorized_svg_path: r.vectorized_svg_path,
+        }))}
+      />
+    );
+  }
 
   return (
     <PaletteEditor
       design={{
         id: design.id,
         original_filename: design.original_filename,
-        palette_confirmed_at: design.palette_confirmed_at,
         color_count: design.color_count,
       }}
       regions={regions}

@@ -1,89 +1,86 @@
 # Carton Box Design Automation
 
-Internal tool replacing 1.5 full-time designers at my family's carton box manufacturing factory in Myanmar. This tool replaces a workflow I watched my family's design team do thousands of times growing up.
+This repo is a code-based attempt at automating logo design for my family's carton box factory in Myanmar. I started building it, hit real limits, and replaced it with a no-code workflow that worked better for the factory. I am keeping the code here as a record of the approach and the decision to drop it.
 
-
-Designers receive sample boxes from customers and recreate them as print-ready files in Adobe Illustrator. The manual process takes ~60 minutes per box and consumes 2 designers' full work week. This app cuts that to ~5 minutes.
+The solution that actually shipped is described below under "What I shipped instead."
 
 ## The problem
 
-When a customer orders carton boxes, they send a sample of the design they want printed. The factory's design team:
+My family runs a carton box factory in Myanmar. When a customer places an order, they send a sample box with their logo printed on it. A designer then recreates that logo as a print-ready file in Adobe Illustrator, by hand.
 
-1. Photographs each panel of the sample box
-2. Manually traces every text element and logo in Illustrator
-3. Matches fonts, redraws logos, picks colors
-4. Exports a die-cut layout for the print shop
+That redraw took about two hours per logo and was the slowest step before printing could start. Since the 2021 military coup, many skilled people have left the country, and the factory has struggled to hire. At one point it was down to a single designer doing the work of two. They asked me to automate the design step so one person could keep up.
 
-Output looks like this: [will upload when the tool is finished]
+I started by interviewing the designer to find where his time actually went. Almost all of it went into redrawing those logos. That was the part to fix.
 
-The work is repetitive, slow, and is the bottleneck before any printing can start.
+## What I built (this repo)
 
-## The solution
+A Next.js web app for the design step:
 
-A web app that:
+1. Upload photos of the customer's sample box
+2. Crop the regions with logos or text
+3. Preprocess the image (contrast, denoise, color separation) with sharp
+4. Vectorize each region into editable SVG paths with vtracer
+5. Arrange and recolor the pieces on a drag-and-drop canvas (react-konva)
+6. Export a print-ready SVG and PDF
 
-1. Takes photos of the customer's sample box panels as input
-2. Lets the designer crop regions containing text or logos
-3. Auto-vectorizes those regions into clean editable SVG paths
-4. Drops them onto a die-cut canvas where the designer arranges and recolors them
-5. Exports a print-ready SVG and PDF
+It also used Gemini to read the logo's colors and build color masks.
 
-Designer time per box: ~60 min → ~5 min.
+## Why I dropped it
 
-## How it works
+Two reasons.
 
-[Will insert a simple flow diagram here once v1 is working]
-Photo upload → Crop region → Preprocess (sharp) → Vectorize (vtracer)
-→ Drop on canvas (Konva) → Recolor → Export SVG/PDF
+First, the real input photos were a mess. Dirty boxes, pen marks, uneven printing, stray ink. The pure code pipeline produced random artifacts on inputs like these, and there were too many of these cases to handle reliably in code.
 
-## Stack
+I found that Gemini's image generation could take a bad photo and return a clean version of the logo, and that vectorizer.ai produced cleaner traces than my local setup. But wiring those into a custom app did not hold up:
 
-- **Next.js 14** + TypeScript (App Router)
-- **react-konva** for the drag-and-drop canvas
-- **Tailwind** for styling
-- **better-sqlite3** with raw SQL — no ORM
-- **sharp** for image preprocessing (contrast, denoise, color quantization)
-- **@neplex/vectorizer** (vtracer) for image-to-SVG tracing
-- **pdf-lib** for PDF export
-- Local disk file storage on **Railway** with a persistent volume
+- The Gemini API took 4 to 7 minutes per image, while the same task took about a minute on Google's own site.
+- vectorizer.ai's API came with very little credit, while their web app was unlimited.
 
-## Why this stack
+Running the factory's volume through the APIs would have cost about 35 dollars a month. Doing the same thing by hand on the two websites cost 10. For a small factory in Myanmar, that gap is real money, and the API was slow on top of it. A custom build was the wrong call.
 
-- Picked tools I already know cold so I can ship v1 in days, not weeks
-- Raw SQL over an ORM because the schema is simple and I don't want abstractions I don't fully understand
-- Railway over Vercel because vectorization can take 30+ seconds per image and Vercel's serverless timeouts would force constant workarounds
-- SQLite over Postgres because the app has 2 users, not 2 million
+## What I shipped instead
 
-## Status
+A no-code workflow the designer runs himself:
 
-[Will update this as I go.]
+1. Generate a clean version of the logo on Google AI Studio (Gemini)
+2. Vectorize it on vectorizer.ai
+3. Import the SVG into Adobe Illustrator
 
-- [x] Project bootstrapped
-- [x] Photo upload + storage
-- [x] Color palette detection (Gemini + sharp masks)
-- [ ] Per-color vectorization (monochrome vtracer per mask)
-- [ ] Canvas + drag-and-drop
-- [ ] Color editing (per-group fill swap)
-- [ ] SVG/PDF export
-- [ ] Multi-panel die-cut layout
-- [ ] Customer brand color palettes
+A logo that used to take about two hours now takes about five minutes. This is what the factory uses today.
 
-## Running locally
+## The lesson
 
-```bash
+I had built the code and I wanted to use it. But the no-code version was faster, cheaper, and better for the people using it. The goal was never my software. It was the designer getting his time back. When a no-code path solves the problem better, that is the right answer.
+
+## Stack (of the dropped build)
+
+- Next.js 14 + TypeScript (App Router)
+- react-konva for the canvas
+- Tailwind CSS
+- better-sqlite3 with raw SQL
+- sharp for image preprocessing
+- @neplex/vectorizer (vtracer) for image-to-SVG
+- pdf-lib for PDF export
+- Railway with a persistent volume
+
+## Running the code
+
+This is a partial build and not the production solution. If you want to look at the code:
+
+```
 git clone <repo-url>
-cd carton-box-design
+cd carton-box-designer
 npm install
-cp .env.example .env   # or create .env manually
 npm run dev
 ```
 
-Required `.env` variables:
-- `DATA_DIR` — path to the runtime data directory (default: `./data`)
-- `GEMINI_API_KEY` — Google Gemini API key (get one at https://aistudio.google.com)
+Required `.env`:
+
+- `DATA_DIR` — runtime data directory (default: `./data`)
+- `GEMINI_API_KEY` — Google Gemini API key (https://aistudio.google.com)
 
 Open `http://localhost:3000`.
 
-## Notes
+## Status
 
-Built solo while interning as a GTM Engineer inside a Silicon Valley tech startup - automating the entire GTM workflow and at the same time, empowering the GTM team with in-house GTM tools to 10x productivity. 
+Archived. The code here is an unfinished build that I replaced with the no-code workflow above. I am keeping it public as a record of what I tried and why I stopped.

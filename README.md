@@ -50,7 +50,7 @@ A logo that used to take about two hours now takes about five minutes. This is w
 
 ## The lesson
 
-I had built the code and I wanted to use it. But the no-code version was faster, cheaper, and better for the people using it. The goal was never my software. It was the designer getting his time back. When a no-code path solves the problem better, that is the right answer.
+The lesson was to drop the ego. I had built the code and I wanted to use it. But the no-code version was cheaper and faster, so that is what I shipped. Solving the user's problem matters more than anything else.
 
 ## Stack (of the dropped build)
 

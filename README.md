@@ -6,24 +6,22 @@ The solution that actually shipped is described below under "What I shipped inst
 
 ## The problem
 
-My family runs a carton box factory in Myanmar. When a customer places an order, they send a sample box with their logo printed on it. A designer then recreates that logo as a print-ready file in Adobe Illustrator, by hand.
+My family runs a carton box factory in Myanmar. When a customer places an order, they send a sample box with their logo printed on it or sometimes, send the photo of the logo and the text that they want on their carton box. A designer then recreates that logo as a print-ready file in Adobe Illustrator, by hand.
 
-That redraw took about two hours per logo and was the slowest step before printing could start. Since the 2021 military coup, many skilled people have left the country, and the factory has struggled to hire. At one point it was down to a single designer doing the work of two. They asked me to automate the design step so one person could keep up.
+That redraw took about two to three hours per logo and was the slowest step before printing could start. Since the 2021 military coup, many skilled people have left the country, and the factory has struggled to hire. At one point it was down to a single designer doing the work of two. They asked me to automate the design step so one person could keep up.
 
 I started by interviewing the designer to find where his time actually went. Almost all of it went into redrawing those logos. That was the part to fix.
 
-## What I built (this repo)
+## What I tried to build at first
 
 A Next.js web app for the design step:
 
 1. Upload photos of the customer's sample box
 2. Crop the regions with logos or text
-3. Preprocess the image (contrast, denoise, color separation) with sharp
-4. Vectorize each region into editable SVG paths with vtracer
-5. Arrange and recolor the pieces on a drag-and-drop canvas (react-konva)
+3. Gemini to read the input logo's colors and used it to tell sharp to pick the pixels that is closest to that color.
+4. Preprocess the image (contrast, denoise, color separation) with sharp
+5. Vectorize each region into editable SVG paths with vtracer ( because vtracer was free and since US currency is a lot more expensive than Burmese, I didn't want my factory to use the paid vectorizors )
 6. Export a print-ready SVG and PDF
-
-It also used Gemini to read the logo's colors and build color masks.
 
 ## Why I dropped it
 
@@ -55,13 +53,11 @@ The lesson was to drop the ego. I had built the code and I wanted to use it. But
 ## Stack (of the dropped build)
 
 - Next.js 14 + TypeScript (App Router)
-- react-konva for the canvas
 - Tailwind CSS
 - better-sqlite3 with raw SQL
 - sharp for image preprocessing
 - @neplex/vectorizer (vtracer) for image-to-SVG
 - pdf-lib for PDF export
-- Railway with a persistent volume
 
 ## Running the code
 

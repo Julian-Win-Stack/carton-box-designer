@@ -1,6 +1,8 @@
 # Carton Box Design Automation
 
-This repo is a code-based attempt at automating logo design for my family's carton box factory in Myanmar. I started building it, hit real limits, and replaced it with a no-code workflow that worked better for the factory. I am keeping the code here as a record of the approach and the decision to drop it.
+My family's carton box factory in Myanmar spent two to three hours redrawing every customer logo by hand in Illustrator. It now takes about five minutes.
+
+I got there by building a full pipeline in TypeScript, measuring what it actually cost to run, and then throwing my own build away for something cheaper that worked better for the factory. This repo is the build I killed, kept public as the record of that decision.
 
 The solution that actually shipped is described below under "What I shipped instead."
 

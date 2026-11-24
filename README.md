@@ -4,26 +4,15 @@ My family's carton box factory in Myanmar spent two to three hours redrawing eve
 
 I got there by building a full pipeline in TypeScript, measuring what it actually cost to run, and then throwing my own build away for something cheaper that worked better for the factory. This repo is the build I killed, kept public as the record of that decision.
 
-The solution that actually shipped is described below under "What I shipped instead."
-
 ## The problem
 
-My family runs a carton box factory in Myanmar. When a customer places an order, they send a sample box with their logo printed on it or sometimes, send the photo of the logo and the text that they want on their carton box. A designer then recreates that logo as a print-ready file in Adobe Illustrator, by hand.
+When a customer orders, they send a sample box or a photo of their logo. A designer then redraws that logo by hand in Adobe Illustrator, about two to three hours per logo. The factory struggled to hire and was down to one designer doing the work of two, so they asked me to automate it.
 
-That redraw took about two to three hours per logo and was the slowest step before printing could start. Since the 2021 military coup, many skilled people have left the country, and the factory has struggled to hire. At one point it was down to a single designer doing the work of two. They asked me to automate the design step so one person could keep up.
-
-I started by interviewing the designer to find where his time actually went. Almost all of it went into redrawing those logos. That was the part to fix.
+I interviewed the designer first to find where his time actually went. Almost all of it went into redrawing logos. That was the part to fix.
 
 ## What I tried to build at first
 
-A Next.js web app for the design step:
-
-1. Upload photos of the customer's sample box
-2. Crop the regions with logos or text
-3. Gemini to read the input logo's colors and used it to tell sharp to pick the pixels that is closest to that color.
-4. Preprocess the image (contrast, denoise, color separation) with sharp
-5. Vectorize each region into editable SVG paths with vtracer ( because vtracer was free and since US currency is a lot more expensive than Burmese, I didn't want my factory to use the paid vectorizors )
-6. Export a print-ready SVG and PDF
+A Next.js web app: upload a photo of the sample box, clean it up, turn it into editable vector paths with free local tools, export a print-ready file.
 
 ## Why I dropped it
 
@@ -50,35 +39,8 @@ A logo that used to take about two hours now takes about five minutes. This is w
 
 ## The lesson
 
-The lesson was to drop the ego. I had built the code and I wanted to use it. But the no-code version was cheaper and faster, so that is what I shipped. Solving the user's problem matters more than anything else.
+The lesson was to drop the ego: I had built the code and I wanted to use it, but the no-code version was cheaper and faster, so that is what I shipped. Solving the user's problem matters more than anything else.
 
 ## Stack (of the dropped build)
 
-- Next.js 14 + TypeScript (App Router)
-- Tailwind CSS
-- better-sqlite3 with raw SQL
-- sharp for image preprocessing
-- @neplex/vectorizer (vtracer) for image-to-SVG
-- pdf-lib for PDF export
-
-## Running the code
-
-This is a partial build and not the production solution. If you want to look at the code:
-
-```
-git clone <repo-url>
-cd carton-box-designer
-npm install
-npm run dev
-```
-
-Required `.env`:
-
-- `DATA_DIR` — runtime data directory (default: `./data`)
-- `GEMINI_API_KEY` — Google Gemini API key (https://aistudio.google.com)
-
-Open `http://localhost:3000`.
-
-## Status
-
-Archived. The code here is an unfinished build that I replaced with the no-code workflow above. I am keeping it public as a record of what I tried and why I stopped.
+Next.js 14 + TypeScript, Tailwind CSS, better-sqlite3 with raw SQL, sharp for image preprocessing, @neplex/vectorizer (vtracer) for image-to-SVG, pdf-lib for PDF export.

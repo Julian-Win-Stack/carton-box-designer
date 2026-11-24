@@ -33,10 +33,10 @@ First, the real input photos were a mess. Dirty boxes, pen marks, uneven printin
 
 I found that Gemini's image generation could take a bad photo and return a clean version of the logo, and that vectorizer.ai produced cleaner traces than my local setup. But wiring those into a custom app did not hold up:
 
-- The Gemini API took 4 to 7 minutes per image, while the same task took about a minute on Google's own site.
+- The Gemini API was unreliable for me at the time (the model was still in preview). Some calls hung until they timed out, so an image could take minutes. The same task took about a minute on Google's own site.
 - vectorizer.ai's API came with very little credit, while their web app was unlimited.
 
-Running the factory's volume through the APIs would have cost about 35 dollars a month. Doing the same thing by hand on the two websites cost 10. For a small factory in Myanmar, that gap is real money, and the API was slow on top of it. A custom build was the wrong call.
+Running the factory's volume through the APIs would have cost about 35 dollars a month. Doing the same thing by hand on the two websites cost 10. For a small factory in Myanmar, that gap is real money, and the API was unreliable on top of it. A custom build was the wrong call.
 
 ## What I shipped instead
 
